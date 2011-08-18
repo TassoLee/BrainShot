@@ -4,9 +4,9 @@ PROJECTNAME=BrainShot
 APPFOLDER=$(PROJECTNAME).app
 INSTALLFOLDER=$(PROJECTNAME).app
 
-IPHONE_IP=192.168.1.76
+IPHONE_IP=192.168.100.100
 
-CC=arm-apple-darwin9-gcc
+CC=/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/gcc
 LD=$(CC)
 
 LDFLAGS=	-lobjc \
@@ -20,8 +20,11 @@ LDFLAGS=	-lobjc \
 		-framework OpenAL \
 		-framework AudioToolbox \
 		-framework AVFoundation \
+		-framework StoreKit \
 		-lz \
+		-lAdMob \
 		-lsqlite3.0 \
+		-L. \
 		-w
 #LDFLAGS += -framework AddressBookUI
 #LDFLAGS += -framework AddressBook
@@ -37,6 +40,7 @@ CFLAGS += -I./libs/FontLabel/
 CFLAGS += -I./libs/cocos2d/
 CFLAGS += -I./libs/cocos2d/Support
 CFLAGS += -I./libs/CocosDenshion
+CFLAGS += -I.
 #CFLAGS += -I./Classes/ObjectiveResource
 #CFLAGS += -I./Classes/ObjectiveResource/objective_support/Core
 #CFLAGS += -I./Classes/ObjectiveResource/objective_support/Core/Inflections
@@ -51,6 +55,10 @@ CFLAGS += -I./Classes/Models
 CFLAGS += -include ./*_Prefix.pch
 #以下内容会导致iphone报 No class named iphoneAppDelegate is loaded的错误
 #CFLAGS += -x objective-c-header 
+
+SYS_SPECS = -arch armv6 -arch armv7 -isysroot /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS4.3.sdk
+CFLAGS += $(SYS_SPECS)
+LDFLAGS += $(SYS_SPECS)
 
 
 BUILDDIR=./build
@@ -92,7 +100,7 @@ bundle:	$(PROJECTNAME)
 	@echo "APPL????" > $(BUILDDIR)/$(APPFOLDER)/PkgInfo
 
 main.o:	main.m
-	$(CC) -c $< -o $@
+	$(CC) $(SYS_SPECS) -c $< -o $@
 
 %.o:	%.c
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -104,7 +112,7 @@ main.o:	main.m
 deploy: all
 	@ssh root@$(IPHONE_IP) "cd /Applications/$(INSTALLFOLDER) && rm -R * || echo 'not found' "
 	@scp -r $(BUILDDIR)/$(APPFOLDER) root@$(IPHONE_IP):/Applications
-	@ssh root@$(IPHONE_IP) "cd /Applications/$(INSTALLFOLDER) ; ldid -S $(PROJECTNAME)_;"
+	#@ssh root@$(IPHONE_IP) "cd /Applications/$(INSTALLFOLDER) ; ldid -S $(PROJECTNAME)_;"
 
 #不用每次deploy都kill spring，修改的代码会生效
 spring:

@@ -1,0 +1,5 @@
+This BrainShot is forked from https://github.com/saberma/BrainShot. It's main purpose is port the 3rd-party compiler to Apple official compiler from iOS SDK 4.3 on Mac OS X SnowLeopard.
+
+Here is my dev environment:
+Mac OS X 10.6.7
+Xcode4 with iOS SDK 4.3
